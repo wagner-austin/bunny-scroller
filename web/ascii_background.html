@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ASCII Animation Background</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #0a0a0a;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        /* ASCII background layer */
+        #ascii-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            pointer-events: none;
+        }
+
+        #ascii-art {
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 12px;
+            line-height: 1.1;
+            color: #3a3a3a;
+            white-space: pre;
+            user-select: none;
+        }
+
+        /* Content layer - your actual content goes here */
+        #content {
+            position: relative;
+            z-index: 1;
+            color: white;
+            padding: 40px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        p {
+            font-size: 1.2rem;
+            line-height: 1.6;
+            opacity: 0.8;
+        }
+
+        /* Optional: Multiple trees scrolling */
+        .tree-container {
+            position: absolute;
+            bottom: 0;
+            animation: scroll-right linear infinite;
+        }
+
+        @keyframes scroll-right {
+            from { transform: translateX(-100%); }
+            to { transform: translateX(100vw); }
+        }
+    </style>
+</head>
+<body>
+    <div id="ascii-bg">
+        <pre id="ascii-art"></pre>
+    </div>
+
+    <div id="content">
+        <h1>Your Content Here</h1>
+        <p>The ASCII art animates in the background. You can put any content on top of it.</p>
+    </div>
+
+    <script>
+        // =====================================================================
+        // ASCII FRAMES - Paste your frames here
+        // =====================================================================
+
+        // Small tree frames (far/background)
+        const FRAMES_SMALL = [
+`       . .
+       ++.
+    ..+++.+--.
+    ++++++-++.
+    .++++-----++ .
+ ...++---+--+--+++
+...++-++-+..+--..
+ .++++.++----++..
+    ..+  +....
+         .
+        ..
+         +
+         +
+         ...........`,
+`        .+.
+       .++-..+.
+      .+++-....
+      .+.--++.+
+   +.+.+++-.+..   .
+      ++-..+++++   .
+    +++++  .-.-++++.
+     .++++ +++--++.
+      .++.+++-+++++.
+    ++.++++++++-+.+.
+     ++++.+.++--+ ..
+      .++++.+---+.+-
+      . .. ++++++++.
+      +++..---+++-#-`,
+`         .+.
+        -+++-.
+       .++.+++.
+       --.++-++
+    +.+--.++++.
+   ...+++.-++-.   .
+       ..++.-+-++-
+    .++-+ .+++++--
+      ++++-++-++-+++
+       ..+.-+++-+++-
+    .+.-+.++++-.-.+-
+     .+-+.+--+.+-.++
+         ..-...-+...
+       .+.+++++++-.-`,
+`        ..+
+       .+++..
+       +++.+.-
+       --++++-.   .
+     ...+.---.  ...
+   ..  .+--.-++   ..
+      .+++..-+++.
+     +++++-++-+--+.
+       .++-+++-++++-
+      .+.+.+++++-.++
+     ++.-.++-++.-+.
+      ---.+++--+.-..
+          .-+.-+.+-.
+        +.+++++++.++`,
+        ];
+
+        // Medium tree frames
+        const FRAMES_MED = [
+`                     ..   .+
+                    +--+..++
+                    +-+--.++.
+                    .++-+++-.
+                 ... +--++++    .++ .++-
+              .  ++++.++-++.  ..#--.+++
+           .-+-+ .++--+++.  .+-+#--+--+
+             -+.- +----+- .+-------+--+
+             +.-.++--+++-+--+---+-+--+
+         .-.+..+-+++-+++.-+.+-+-+--+. .
+          ..++-.-+.++-++.. +++.++  +.+---
+            +.++.-.+++++.+-+-+--+-+####-   ...
+            ..+-..++--++.+---+-+-#####+. .-#-#  . .
+            .+++ +#-#++-+---------#-.++--###--+.+.++
+   +..+.  ...++.--+#---++-#----#-+.++#######-+--++.+.
+   +++.++ .--.-#-+--#-#+-+-+.-----+-####-+- -.++.+++.
+    .++-+++++--+-+--#---++- ..+-++--++++.+-.-+--++.+
+         +.+..++--+-+#+++-#--....+ ..++-++++++-.
+ +....  +.+..-+#-..++---++#+.......---++++++
+ +++.+..+#+-#--+-..+ ++---#++.+++++++-+-+---+ +.+.
+  +++------#------+-+++-+-#-+-+---+++--####-#++--.
+     +-###--+----+++.++--.#--+-----++ ..+++++--+.
+     +...     ..+ +. +++. --.-+.++##--.
+            +.+.+.+....+  --+-+.+...#-#-
+          .++++..+.+-.  ..+#...+++    .+      .
+         -.+...  +-+.     --   .
+                  .       -+            .            .
+                          #.            .
+              .           #
+                          #     .   .           ..
+                         .#
+                         .#
+                         .#.
+                          #+
+                          #-
+                          -#
+                          +#.
+                          .-.
+             .............................................
+                         ................................+
+                              ............................`,
+        ];
+
+        // =====================================================================
+        // ANIMATION LOGIC
+        // =====================================================================
+
+        let currentFrameSet = FRAMES_SMALL;
+        let frameIndex = 0;
+        let sizeIndex = 0;
+
+        // Zoom pattern: small -> med -> large -> med -> repeat
+        const frameSets = [FRAMES_SMALL, FRAMES_MED, FRAMES_SMALL, FRAMES_MED];
+
+        const asciiElement = document.getElementById('ascii-art');
+
+        function animate() {
+            // Display current frame
+            asciiElement.textContent = currentFrameSet[frameIndex];
+
+            // Advance frame
+            frameIndex++;
+
+            // If we've gone through all frames, switch to next size
+            if (frameIndex >= currentFrameSet.length) {
+                frameIndex = 0;
+                sizeIndex = (sizeIndex + 1) % frameSets.length;
+                currentFrameSet = frameSets[sizeIndex];
+            }
+        }
+
+        // Start animation (200ms per frame = 5 FPS)
+        setInterval(animate, 200);
+        animate(); // Initial frame
+    </script>
+</body>
+</html>
