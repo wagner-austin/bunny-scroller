@@ -8,9 +8,9 @@ import json
 # Add parent to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from tree_frames.w100_frames import FRAMES as TREE_FRAMES
-from bunny_frames.w40_frames import FRAMES as BUNNY_FRAMES_LEFT
-from bunny_frames.w40_right_frames import FRAMES as BUNNY_FRAMES_RIGHT
+from frames.tree.w100_frames import FRAMES as TREE_FRAMES
+from frames.bunny.w40_frames import FRAMES as BUNNY_FRAMES_LEFT
+from frames.bunny.w40_right_frames import FRAMES as BUNNY_FRAMES_RIGHT
 
 # Using imported bunny frames now
 _BUNNY_FRAMES_OLD = [
